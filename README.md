@@ -1,6 +1,6 @@
 # Movo Control ROS Package (ver. 3)
 
-ROS Package and supplementary files for controlling a [Kinova Movo](https://www.kinovarobotics.com/sites/default/files/OP-03_2019-05_R01.pdf) robot.  
+ROS package and supplementary files for controlling a [Kinova Movo](https://www.kinovarobotics.com/sites/default/files/OP-03_2019-05_R01.pdf) robot.  
 Improved version of [movo-control-2](https://github.com/joshuawisc/movo-control-2).  
 Adds better interaction with [movo-sim-tasks](https://github.com/joshuawisc/movo-sim-tasks) and adds more Xbox control schemes.
 
