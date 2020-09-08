@@ -1,0 +1,8 @@
+<launch>
+<!--Launches nodes required for mimicry control with 1 controller-->
+    <include file="$(find relaxed_ik)/launch/load_info_file.launch"/>
+    <include file="$(find relaxed_ik)/launch/rviz_viewer.launch"/>
+    <include file="$(find relaxed_ik)/launch/relaxed_ik_julia.launch"/>
+    <node name="xbox_to_ros" pkg="movo_mimicry" type="xbox_to_ros.py" />
+
+</launch>

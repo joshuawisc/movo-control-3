@@ -1,0 +1,11 @@
+<launch>
+<!--Launches nodes required for mimicry control with 1 controller-->
+    <include file="$(find relaxed_ik)/launch/load_info_file.launch"/>
+    <include file="$(find relaxed_ik)/launch/rviz_viewer.launch"/>
+    <include file="$(find relaxed_ik)/launch/relaxed_ik_julia.launch"/>
+    <node name="controller_publisher_dual" pkg="mimicry_control" type="controller_publisher_dual.py" />
+    <node name="pose_goal_pub_dual" pkg="movo_mimicry" type="ee_pose_goal_pub_single_ctrl_dual.py" />
+    <node name="movo_vel_controller" pkg="movo_mimicry" type="movo_vel_controller.py" launch-prefix="gnome-terminal -- "/>
+    <node name="vive_position" pkg="rostopic" type="rostopic" args="echo /vive_controller/position_r" launch-prefix="gnome-terminal -- "/>
+
+</launch>

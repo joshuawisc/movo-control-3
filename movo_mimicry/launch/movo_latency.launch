@@ -1,0 +1,9 @@
+<launch>
+
+    <!--Launches latency node and remapped Movo velocity controller-->
+    <arg name="latency" default="3"/>
+    <node name="latency_node" pkg="movo_mimicry" type="latency.py" args="$(arg latency)"/>
+    <remap from="/relaxed_ik/joint_angle_solutions" to="/delayed/relaxed_ik/joint_angle_solutions"/>
+    <node name="movo_vel_controller" pkg="movo_mimicry" type="movo_vel_controller_sim.py"/>
+
+</launch>

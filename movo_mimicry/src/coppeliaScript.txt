@@ -1,0 +1,147 @@
+function sysCall_init()
+    -- do some initialization here
+    robotHandle=sim.getObjectAssociatedWithScript(sim.handle_self)
+    linearJoint=sim.getObjectHandle("linear_joint") -- Handle of the left motor
+    rightArmNames = {}
+    rightArmNames[1] = "right_shoulder_pan_joint"
+    rightArmNames[2] = "right_shoulder_lift_joint"
+    rightArmNames[3] = "right_arm_half_joint"
+    rightArmNames[4] = "right_elbow_joint"
+    rightArmNames[5] = "right_wrist_spherical_1_joint"
+    rightArmNames[6] = "right_wrist_spherical_2_joint"
+    rightArmNames[7] = "right_wrist_3_joint"
+
+    rightArmJoints = {}
+    for i=1,7 do
+        rightArmJoints[i] = sim.getObjectHandle(rightArmNames[i])
+    end
+
+    leftArmNames = {}
+    leftArmNames[1] = "left_shoulder_pan_joint"
+    leftArmNames[2] = "left_shoulder_lift_joint"
+    leftArmNames[3] = "left_arm_half_joint"
+    leftArmNames[4] = "left_elbow_joint"
+    leftArmNames[5] = "left_wrist_spherical_1_joint"
+    leftArmNames[6] = "left_wrist_spherical_2_joint"
+    leftArmNames[7] = "left_wrist_3_joint"
+
+    leftArmJoints = {}
+    for i=1,7 do
+        leftArmJoints[i] = sim.getObjectHandle(leftArmNames[i])
+    end
+
+    leftGripperJoints = {}
+    leftGripperJoints[1] = sim.getObjectHandle("left_gripper_finger1_joint")
+    leftGripperJoints[2] = sim.getObjectHandle("left_gripper_finger1_inner_knuckle_joint")
+    leftGripperJoints[3] = sim.getObjectHandle("left_gripper_finger1_finger_tip_joint")
+    leftGripperJoints[4] = sim.getObjectHandle("left_gripper_finger2_joint")
+    leftGripperJoints[5] = sim.getObjectHandle("left_gripper_finger2_inner_knuckle_joint")
+    leftGripperJoints[6] = sim.getObjectHandle("left_gripper_finger2_finger_tip_joint")
+
+    -- Launch the ROS client application:
+    if simROS then
+        print("<font color='#0F0'>ROS interface was found.</font>@html")
+        local sysTime=sim.getSystemTimeInMs(-1)
+        -- Prepare the publishers and subscribers:
+        rightArmJSPub=simROS.advertise('/movo/right_arm/joint_states','sensor_msgs/JointState')
+        leftArmJSPub=simROS.advertise('/movo/left_arm/joint_states','sensor_msgs/JointState')
+
+        linearJointCmdSub=simROS.subscribe('/movo/linear_actuator_cmd/','movo_msgs/LinearActuatorCmd','setLinearJoint_cb')
+        rightArmVelSub=simROS.subscribe('/movo/right_arm/angular_vel_cmd','movo_msgs/JacoAngularVelocityCmd7DOF','rightArmVel_cb')
+        leftArmVelSub=simROS.subscribe('/movo/left_arm/angular_vel_cmd','movo_msgs/JacoAngularVelocityCmd7DOF','leftArmVel_cb')
+        leftGripperSub=simROS.subscribe('/movo/left_gripper/cmd', 'movo_msgs/GripperCmd', 'leftGripper_cb')
+
+    else
+        print("<font color='#F00'>ROS interface was not found. Cannot run.</font>@html")
+    end
+
+end
+
+function leftGripper_cb(msg)
+    val = msg.position
+    print(val)
+    sim.setJointTargetPosition(leftGripperJoints[1], val)
+    sim.setJointPosition(leftGripperJoints[2], val)
+    sim.setJointPosition(leftGripperJoints[3], -1*val)
+    sim.setJointTargetPosition(leftGripperJoints[4], val)
+    sim.setJointTargetPosition(leftGripperJoints[5], val)
+    sim.setJointTargetPosition(leftGripperJoints[6], -1*val)
+
+
+    for i=1,6 do
+        if i==3 or i==6 then
+            sim.setJointTargetPosition(leftGripperJoints[i], -1*val)
+        else
+            sim.setJointTargetPosition(leftGripperJoints[i], val)
+        end
+
+    end
+end
+
+function setLinearJoint_cb(msg)
+    -- Linear actuator position subscriber callback
+    sim.setJointTargetPosition(linearJoint,msg.desired_position_m)
+end
+
+function rightArmVel_cb(msg)
+    -- Linear actuator position subscriber callback
+
+    for i=1,7 do
+        sim.setJointTargetVelocity(rightArmJoints[i],math.rad(msg["theta"..string.sub(rightArmNames[i], 6)]))
+    end
+end
+
+function leftArmVel_cb(msg)
+    -- Linear actuator position subscriber callback
+
+    for i=1,7 do
+        print(math.rad(msg["theta"..string.sub(leftArmNames[i], 5)]))
+        sim.setJointTargetVelocity(leftArmJoints[i],math.rad(msg["theta"..string.sub(leftArmNames[i], 5)]))
+    end
+end
+
+
+function sysCall_actuation()
+    -- put your actuation code here
+    --TODO: change deg to radians
+    if simROS then
+        -- Send the arm positions:
+        positions = {}
+        for i=1,7 do
+            positions[i]=sim.getJointPosition(rightArmJoints[i])
+        end
+        rightArmJSMsg = {
+            header={
+                stamp = sim.getSystemTime()
+            },
+            name=rightArmNames,
+            position=positions,
+        }
+        simROS.publish(rightArmJSPub, rightArmJSMsg)
+
+        positions = {}
+        for i=1,7 do
+            positions[i]=sim.getJointPosition(leftArmJoints[i])
+        end
+        leftArmJSMsg = {
+            header={
+                stamp = sim.getSystemTime()
+            },
+            name=leftArmNames,
+            position=positions,
+        }
+        simROS.publish(leftArmJSPub, leftArmJSMsg)
+        --simROS.sendTransform(getTransformStamped(robotHandle,'rosInterfaceControlledBubbleRob',-1,'world'))
+    end
+
+end
+
+function sysCall_sensing()
+    -- put your sensing code here
+end
+
+function sysCall_cleanup()
+    -- do some clean-up here
+end
+
+-- See the user manual or the available code snippets for additional callback functions and details
