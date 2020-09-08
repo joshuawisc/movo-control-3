@@ -1,6 +1,6 @@
-# Movo Control ROS Package
+# Movo Control ROS Package (ver. 3)
 
-ROS Package and supplementary files for controlling a [Kinova Movo](https://www.kinovarobotics.com/sites/default/files/OP-03_2019-05_R01.pdf) robot. Improved version of [movo-control-2](). Adds better interaction with [movo-simulation]() and adds more Xbox control schemes.
+ROS Package and supplementary files for controlling a [Kinova Movo](https://www.kinovarobotics.com/sites/default/files/OP-03_2019-05_R01.pdf) robot. Improved version of [movo-control-2](https://github.com/joshuawisc/movo-control-2). Adds better interaction with [movo-sim-tasks](https://github.com/joshuawisc/movo-sim-tasks) and adds more Xbox control schemes.
 
 # Contents
 1. [Files Included](#1-files-included)
@@ -56,7 +56,7 @@ OR
 
 # 5. Xbox Control
 
-Control both arms of the Movo using an Xbox One controller. Go to [here]() for more information on control schemes and mappings.
+Control both arms of the Movo using an Xbox One controller. Go [here](https://github.com/joshuawisc/movo-control-3/tree/master/movo_mimicry) for more information on control schemes and mappings.
 
 ## Usage
 
